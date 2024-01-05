@@ -1,6 +1,7 @@
 import { APIInterface, BaseRequestOptions } from "./interfaces/api.interface";
 const bitcoin = require('bitcoinjs-lib');
 import * as ecc from 'tiny-secp256k1';
+import * as dotenv from 'dotenv'
 bitcoin.initEccLib(ecc);
 import * as cbor from 'borc';
 export { ElectrumApiMock } from "./api/electrum-api-mock";
@@ -84,6 +85,7 @@ export { buildAtomicalsFileMapFromRawTx, hexifyObjectWithUtf8, isValidRealmName,
 export { createMnemonicPhrase } from "./utils/create-mnemonic-phrase";
 export { detectAddressTypeToScripthash, detectScriptToAddressType } from "./utils/address-helpers";
 
+dotenv.config();
 export { bitcoin };
 export class Atomicals implements APIInterface {
   constructor(private electrumApi: ElectrumApiInterface) {
@@ -1361,6 +1363,22 @@ try {
     window['atomicals'] = {
       instance: instance
     };
+  } else {
+    if (process.env.LOG_TO_FILE && process.env.LOG_TO_FILE === 'true') {
+      const fs = require('fs');
+      const path = process.env.LOG_FILE || 'log.txt';
+      const logStream = fs.createWriteStream(path, { flags: 'a' });
+
+      const originalLog = console.log;
+
+      console.log = function(data) {
+        originalLog(data);
+        if (typeof data === 'object') {
+          data = JSON.stringify(data);
+        }
+        logStream.write(data + '\n');
+      };
+    }
   }
 }
 catch (ex) {

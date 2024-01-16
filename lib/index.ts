@@ -1371,12 +1371,15 @@ try {
 
       const originalLog = console.log;
 
-      console.log = function(data) {
-        originalLog(data);
-        if (typeof data === 'object') {
-          data = JSON.stringify(data);
+      console.log = function(message?: any, ...optionalParams: any[]) {
+        originalLog(message, ...optionalParams);
+        if (typeof message === 'object') {
+          message = JSON.stringify(message);
         }
-        logStream.write(data + '\n');
+        for (let i in optionalParams) {
+          message = message + " "+ JSON.stringify(optionalParams[i]);
+        }
+        logStream.write(message + '\n');
       };
     }
   }

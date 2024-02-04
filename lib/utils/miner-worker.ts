@@ -120,7 +120,7 @@ if (parentPort) {
             address: updatedBaseCommit.scriptP2TR.address,
             value: getOutputValueForCommit(fees),
         };
-        let finalCopyData, finalPrelimTx, finalSequence;
+        let finalCopyData, finalPrelimTx;
 
         let lastGenerated = 0;
         let generated = 0;
@@ -128,10 +128,24 @@ if (parentPort) {
 
         // Start mining loop, terminates when a valid proof of work is found or stopped manually
         do {
-
-            // This worker has tried all assigned sequence range but it did not find solution.
+            // If the sequence has exceeded the max sequence allowed, generate a newtime and reset the sequence until we find one.
             if (sequence > seqEnd) {
-                finalSequence = -1;
+                copiedData["args"]["time"] = Math.floor(Date.now() / 1000);
+
+                atomPayload = new AtomicalsPayload(copiedData);
+                const newBaseCommit: { scriptP2TR; hashLockP2TR; hashscript } =
+                    workerPrepareCommitRevealConfig(
+                        workerOptions.opType,
+                        fundingKeypair,
+                        atomPayload
+                    );
+                updatedBaseCommit = newBaseCommit;
+                fixedOutput = {
+                    address: updatedBaseCommit.scriptP2TR.address,
+                    value: getOutputValueForCommit(fees),
+                };
+
+                sequence = seqStart;
             }
             if (sequence % 10000 == 0) {
                 console.log(
@@ -192,7 +206,6 @@ if (parentPort) {
 
                 finalCopyData = copiedData;
                 finalPrelimTx = prelimTx;
-                finalSequence = sequence;
                 workerPerformBitworkForCommitTx = false;
                 break;
             }
@@ -209,25 +222,23 @@ if (parentPort) {
                 );
                 lastTime = Date.now();
                 lastGenerated = generated;
-                await sleep(0);
+                await immediate();
             }
         } while (workerPerformBitworkForCommitTx);
 
-        if (finalSequence && finalSequence != -1) {
-            // send a result or message back to the main thread
-            console.log(
-                "Got one finalCopyData: " + JSON.stringify(finalCopyData)
-            );
-            console.log(
-                "Got one finalPrelimTx: " + finalPrelimTx.toString()
-            );
-            console.log("Got one finalSequence: " + JSON.stringify(sequence));
+        // send a result or message back to the main thread
+        console.log(
+            "Got one finalCopyData: " + JSON.stringify(finalCopyData)
+        );
+        console.log(
+            "Got one finalPrelimTx: " + finalPrelimTx.toString()
+        );
+        console.log("Got one finalSequence: " + JSON.stringify(sequence));
 
-            parentPort!.postMessage({
-                finalCopyData,
-                finalSequence: sequence,
-            });
-        }
+        parentPort!.postMessage({
+            finalCopyData,
+            finalSequence: sequence,
+        });
     });
 }
 
@@ -351,4 +362,8 @@ export const appendMintUpdateRevealScript = (
 
 function sleep(ms: number) {
     return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function immediate() {
+    return new Promise(resolve => setImmediate(resolve));
 }

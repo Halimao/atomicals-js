@@ -1266,10 +1266,11 @@ program.command('get')
   .action(async (atomicalAliasOrId, options) => {
     try {
       await validateWalletStorage();
+      const atomicalAliasOrIdLC = atomicalAliasOrId.toLowerCase()
       const config: ConfigurationInterface = validateCliInputs();
       const atomicals = new Atomicals(ElectrumApi.createClient(process.env.ELECTRUMX_PROXY_BASE_URL || ''));
       const verbose = options.verbose ? true : false;
-      const result = await atomicals.resolveAtomical(atomicalAliasOrId, AtomicalsGetFetchType.GET, undefined, verbose);
+      const result = await atomicals.resolveAtomical(atomicalAliasOrIdLC, AtomicalsGetFetchType.GET, undefined, verbose);
       handleResultLogging(result, true);
     } catch (error) {
       console.log(error);
@@ -1690,9 +1691,9 @@ program.command('mint-dft')
   .description('Mint coins for a decentralized fungible token (FT)')
   .argument('<ticker>', 'string')
   .option('--rbf', 'Whether to enable RBF for transactions.')
-  .option('--current', 'Whether to mine with the current actual bitwork. By default the next one is used for more reliability')
   .option('--initialowner <string>', 'Assign claimed tokens into this address')
   .option('--funding <string>', 'Use wallet alias wif key to be used for funding and change')
+  .option('--current', 'Mine the current bitwork. If disabled mines the next.')
   .option('--satsbyte <number>', 'Satoshis per byte in fees', '-1')
   .option('--disablechalk', 'Whether to disable the real-time chalked logging of each hash for Bitwork mining. Improvements mining performance to set this flag')
   .action(async (ticker, options) => {

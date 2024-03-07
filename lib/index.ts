@@ -306,11 +306,10 @@ export class Atomicals implements APIInterface {
     }
   }
 
-
-  async mintNftInteractive(options: BaseRequestOptions, files: string[], address: string, WIF: string): Promise<CommandResultInterface> {
+  async mintNftInteractive(options: BaseRequestOptions, file: string, address: string, WIF: string): Promise<CommandResultInterface> {
     try {
       await this.electrumApi.open();
-      const command: CommandInterface = new MintInteractiveNftCommand(this.electrumApi, options, files, address, WIF);
+      const command: CommandInterface = new MintInteractiveNftCommand(this.electrumApi, options, file, address, WIF);
       return await command.run();
     } catch (error: any) {
       return {
@@ -465,6 +464,7 @@ export class Atomicals implements APIInterface {
     mintBitworkRevealIncrement: number | null, 
     mintBitworkCommitIncrementStart: number | null,
     mintBitworkRevealIncrementStart: number | null, 
+    maxGlobalMints: number | null,
     WIF: string,
     noImage?: boolean,
   ): Promise<CommandResultInterface> {
@@ -484,6 +484,7 @@ export class Atomicals implements APIInterface {
         mintBitworkRevealIncrement, 
         mintBitworkCommitIncrementStart,
         mintBitworkRevealIncrementStart,
+	maxGlobalMints,
         WIF,
         noImage);
       return await command.run();
@@ -682,10 +683,10 @@ export class Atomicals implements APIInterface {
     }
   }
 
-  async deleteInteractive(options: BaseRequestOptions, atomicalId: string, filesToDelete: string[], funding: IWalletRecord, atomicalOwner: IWalletRecord): Promise<CommandResultInterface> {
+  async deleteInteractive(options: BaseRequestOptions, atomicalId: string, filesWithDeleteKeys: string, funding: IWalletRecord, atomicalOwner: IWalletRecord): Promise<CommandResultInterface> {
     try {
       await this.electrumApi.open();
-      const command: CommandInterface = new DeleteInteractiveCommand(this.electrumApi, options, atomicalId, filesToDelete, funding, atomicalOwner);
+      const command: CommandInterface = new DeleteInteractiveCommand(this.electrumApi, options, atomicalId, filesWithDeleteKeys, funding, atomicalOwner);
       return await command.run();
     } catch (error: any) {
       return {

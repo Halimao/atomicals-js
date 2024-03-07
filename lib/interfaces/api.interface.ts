@@ -27,7 +27,7 @@ export const BASE_REQUEST_OPTS_DEFAULTS = {
 
 export interface APIInterface {
     // Mint non-fungible-token methods (NFT)
-    mintNftInteractive(options: BaseRequestOptions, files: string[], address: string, WIF: string): Promise<CommandResultInterface>;
+    mintNftInteractive(options: BaseRequestOptions, file: string, address: string, WIF: string): Promise<CommandResultInterface>;
     mintRealmInteractive(options: BaseRequestOptions, requestRealm: string, address: string, WIF: string): Promise<CommandResultInterface>;
     mintSubrealmInteractive(options: BaseRequestOptions, requestSubRealm: string, address: string, WIF: string, owner: IWalletRecord): Promise<CommandResultInterface>;
     mintContainerInteractive(options: BaseRequestOptions, requestContainer: string, address: string, WIF: string): Promise<CommandResultInterface>;
@@ -37,7 +37,7 @@ export interface APIInterface {
     mintFtInteractive(options: BaseRequestOptions, file: string, supply: number, address: string, requestTicker: string, WIF: string): Promise<CommandResultInterface>;
     mintDftInteractive(options: BaseRequestOptions, address: string, ticker: string, WIF: string, mineCurrentBitwork?: boolean): Promise<CommandResultInterface>;
     initDftInteractive(options: BaseRequestOptions, file: string, address: string, requestTicker: string, mintAmount: number, maxMints: number, mintHeight: number, mintBitworkc: string, mintBitworkr: string, WIF: string): Promise<CommandResultInterface>;
-    initInfiniteDftInteractive(options: BaseRequestOptions, file: string, address: string, requestTicker: string, mintAmount: number, maxMints: number, mintHeight: number, mintBitworkVector: string, mintBitworkCommitIncrement: number, mintBitworkRevealIncrement: number, mintBitworkCommitIncrementStart: number | null, mintBitworkRevealIncrementStart: number | null, WIF: string, noImage?: boolean): Promise<CommandResultInterface>;
+    initInfiniteDftInteractive(options: BaseRequestOptions, file: string, address: string, requestTicker: string, mintAmount: number, maxMints: number, mintHeight: number, mintBitworkVector: string, mintBitworkCommitIncrement: number, mintBitworkRevealIncrement: number, mintBitworkCommitIncrementStart: number | null, mintBitworkRevealIncrementStart: number | null, maxGlobalMints: number | null, WIF: string, noImage?: boolean): Promise<CommandResultInterface>;
     initFixedDftInteractive(options: BaseRequestOptions, file: string, address: string, requestTicker: string, mintAmount: number, maxMints: number, mintHeight: number, mintBitworkCommit: string, mintBitworkReveal: string | null, WIF: string, noImage?: boolean): Promise<CommandResultInterface>;
 
     // Create data transaction (Non-Atomical/Non-Token)
@@ -47,7 +47,7 @@ export interface APIInterface {
     enableSubrealmRules(options: BaseRequestOptions, realmOrSubrealm: string, file: string, funding: IWalletRecord, atomicalOwner: IWalletRecord): Promise<CommandResultInterface>;
     disableSubrealmRules(options: BaseRequestOptions, realmOrSubrealm: string, funding: IWalletRecord, atomicalOwner: IWalletRecord): Promise<CommandResultInterface>;
     setInteractive(options: BaseRequestOptions, atomicalId: string, jsonFilename: string, funding: IWalletRecord, atomicalOwner: IWalletRecord): Promise<CommandResultInterface>;
-    deleteInteractive(options: BaseRequestOptions, atomicalId: string, keysToDelete: string[], funding: IWalletRecord, atomicalOwner: IWalletRecord): Promise<CommandResultInterface>;
+    deleteInteractive(options: BaseRequestOptions, atomicalId: string, fileKeysToDelete: string, funding: IWalletRecord, atomicalOwner: IWalletRecord): Promise<CommandResultInterface>;
     sealInteractive(options: BaseRequestOptions, atomicalId: string, funding: IWalletRecord, atomicalOwner: IWalletRecord): Promise<CommandResultInterface>;
     splatInteractive(options: BaseRequestOptions, atomicalId: string, funding: IWalletRecord, atomicalOwner: IWalletRecord): Promise<CommandResultInterface>;
     splitItneractive(options: BaseRequestOptions, atomicalId: string, funding: IWalletRecord, atomicalOwner: IWalletRecord): Promise<CommandResultInterface>;

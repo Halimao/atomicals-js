@@ -1149,7 +1149,7 @@ program.command('set-relation')
 program.command('delete')
   .description('Delete keys for existing Atomical.')
   .argument('<atomicalIdAlias>', 'string')
-  .argument('<filesToDelete...>', 'string')
+  .argument('<filesWithDeleteKeys>', 'string')
   .option('--rbf', 'Whether to enable RBF for transactions.')
   .option('--funding <string>', 'Use wallet alias WIF key to be used for funding')
   .option('--owner <string>', 'Use wallet alias WIF key to move the Atomical')
@@ -1158,7 +1158,7 @@ program.command('delete')
   .option('--bitworkc <string>', 'Whether to add any bitwork proof of work to the commit tx')
   .option('--bitworkr <string>', 'Whether to add any bitwork proof of work to the reveal tx.')
   .option('--disablechalk', 'Whether to disable the real-time chalked logging of each hash for mining. Improvements mining performance to set this flag')
-  .action(async (atomicalId, filesToDelete, options) => {
+  .action(async (atomicalId, filesWithDeleteKeys, options) => {
     try {
       const walletInfo = await validateWalletStorage();
       const config: ConfigurationInterface = validateCliInputs();
@@ -1172,7 +1172,7 @@ program.command('delete')
         bitworkc: options.bitworkc ? options.bitworkc : '8',
         bitworkr: options.bitworkr,
         disableMiningChalk: options.disablechalk,
-      }, atomicalId, filesToDelete, ownerWalletRecord, fundingWalletRecord);
+      }, atomicalId, filesWithDeleteKeys, ownerWalletRecord, fundingWalletRecord);
       handleResultLogging(result);
     } catch (error) {
       console.log(error);
@@ -1546,6 +1546,7 @@ program.command('init-dft-perpetual')
   .option('--mintbitworkrincstart <number>', 'The starting amount of bitworkr to increase for each phase of max_mints')
   .option('--max_mints <number>', 'The number of mints allowed per mint phase of max_mints', '2000')
   .option('--mint_height <number>', 'The starting mint height', '0')
+  .option('--maxglobalmints <number>', 'The global max mints')
   .option('--metadata <string>', 'File to include for metadata')
   .option('--mint_amount <number>', 'The number of tokens per mint', '10000')
   .option('--funding <string>', 'Use wallet alias wif key to be used for funding and change')
@@ -1566,6 +1567,7 @@ program.command('init-dft-perpetual')
       const mintHeight = options.mint_height && parseInt(options.mint_height, 10) ? parseInt(options.mint_height, 10) : 0;
       const mintAmount = options.mint_amount && parseInt(options.mint_amount, 10) ? parseInt(options.mint_amount, 10) : 10000;
       const maxMints = options.max_mints && parseInt(options.max_mints, 10) ? parseInt(options.max_mints, 10) : 10000;
+      // const maxGlobalMints = options.max_global_mints && parseInt(options.max_global_mints, 10) ? parseInt(options.max_global_mints, 10) : -1;
       const file = options.metadata;
       const result: any = await atomicals.initInfiniteDftInteractive({
         rbf: options.rbf,
@@ -1589,6 +1591,7 @@ program.command('init-dft-perpetual')
         mintbitworkrinc,
         options.mintbitworkcincstart ? parseInt(options.mintbitworkcincstart) : null,
         options.mintbitworkrincstart ? parseInt(options.mintbitworkrincstart) : null,
+        options.maxglobalmints ? parseInt(options.maxglobalmints) : null,
         fundingRecord.WIF,
         options.noimage
       );
@@ -1715,10 +1718,9 @@ program.command('mint-dft')
     }
   });
 
-
 program.command('mint-nft')
   .description('Mint non-fungible token (NFT) Atomical')
-  .argument('<files...>', 'string')
+  .argument('<file>', 'string')
   .option('--rbf', 'Whether to enable RBF for transactions.')
   .option('--initialowner <string>', 'Initial owner wallet alias to mint the Atomical into')
   .option('--satsbyte <number>', 'Satoshis per byte in fees', '-1')
@@ -1730,7 +1732,7 @@ program.command('mint-nft')
   .option('--parent <string>', 'Whether to require a parent atomical to be spent along with the mint.')
   .option('--parentowner <string>', 'Wallet owner of the parent to spend along with the mint.')
   .option('--disablechalk', 'Whether to disable the real-time chalked logging of each hash for mining. Improvements mining performance to set this flag')
-  .action(async (files, options) => {
+  .action(async (file, options) => {
     try {
       const walletInfo = await validateWalletStorage();
       const config: ConfigurationInterface = validateCliInputs();
@@ -1751,7 +1753,7 @@ program.command('mint-nft')
         parent: options.parent,
         parentOwner: parentOwnerRecord,
         disableMiningChalk: options.disablechalk,
-      }, files, initialOwnerAddress, fundingRecord.WIF);
+      }, file, initialOwnerAddress, fundingRecord.WIF);
       handleResultLogging(result);
     } catch (error) {
       console.log(error);
